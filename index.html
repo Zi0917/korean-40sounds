@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>韓文40音 · 有聲教學</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;500;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0f0f14;
+    --surface:   #1a1a24;
+    --card:      #22223a;
+    --card-hover:#2c2c48;
+    --accent:    #a78bfa;
+    --accent2:   #f472b6;
+    --gold:      #fbbf24;
+    --text:      #e8e6f0;
+    --muted:     #7c7a9a;
+    --active-bg: #3b2f7a;
+    --radius:    14px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    padding: 52px 20px 36px;
+    position: relative;
+  }
+  header::after {
+    content: '';
+    display: block;
+    margin: 24px auto 0;
+    width: 60px; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+  }
+  .subtitle {
+    font-size: .78rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: .04em;
+    background: linear-gradient(135deg, #c4b5fd 0%, #f9a8d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.15;
+  }
+  .h1-sub {
+    font-size: 1rem;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: .04em;
+  }
+
+  /* ── TAB NAV ── */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 0 20px 28px;
+  }
+  .tab {
+    background: var(--surface);
+    border: 1.5px solid transparent;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: .82rem;
+    padding: 7px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .18s;
+    letter-spacing: .05em;
+  }
+  .tab:hover { color: var(--text); border-color: var(--accent); }
+  .tab.active {
+    background: var(--active-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ── SECTION ── */
+  section { display: none; padding: 0 16px; max-width: 860px; margin: 0 auto; }
+  section.visible { display: block; }
+
+  .section-title {
+    font-size: .7rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-left: 4px;
+  }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border: 1.5px solid transparent;
+    border-radius: var(--radius);
+    padding: 18px 8px 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform .13s, background .13s, border-color .13s, box-shadow .13s;
+    position: relative;
+    user-select: none;
+  }
+  .card:hover {
+    background: var(--card-hover);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(167,139,250,.18);
+  }
+  .card.playing {
+    background: var(--active-bg);
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(244,114,182,.25);
+    transform: scale(1.06);
+  }
+
+  .kor {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 7px;
+    display: block;
+    transition: color .13s;
+  }
+  .card:hover .kor { color: var(--accent); }
+  .card.playing .kor { color: var(--accent2); }
+
+  .roman {
+    font-size: .7rem;
+    letter-spacing: .1em;
+    color: var(--muted);
+    display: block;
+  }
+  .zh {
+    font-size: .72rem;
+    color: var(--gold);
+    display: block;
+    margin-top: 3px;
+  }
+
+  /* ripple */
+  .card::after {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: var(--radius);
+    background: radial-gradient(circle, rgba(167,139,250,.3) 0%, transparent 70%);
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+  }
+  .card.playing::after { opacity: 1; }
+
+  /* ── SPEAK indicator ── */
+  .speak-hint {
+    text-align: center;
+    font-size: .75rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+    letter-spacing: .04em;
+  }
+  .speak-hint span { color: var(--accent); }
+
+  /* ── FOOTER NOTE ── */
+  .note {
+    text-align: center;
+    font-size: .72rem;
+    color: var(--muted);
+    margin-top: 8px;
+    padding: 0 16px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 8px; }
+    .kor { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="subtitle">Interactive · 有聲學習</p>
+  <h1>한글 40음</h1>
+  <p class="h1-sub">點擊任意字母，即刻聆聽發音</p>
+</header>
+
+<nav>
+  <button class="tab active" onclick="show('consonant', this)">子音 자음 (19)</button>
+  <button class="tab" onclick="show('vowel', this)">母音 모음 (21)</button>
+  <button class="tab" onclick="show('all', this)">全部一覽</button>
+</nav>
+
+<!-- 子音 -->
+<section id="consonant" class="visible">
+  <p class="speak-hint">點擊字卡 → <span>▶ 朗讀</span></p>
+  <p class="section-title">基本子音 기본 자음 (14)</p>
+  <div class="grid" id="grid-basic-con"></div>
+  <p class="section-title">雙子音 쌍자음 (5)</p>
+  <div class="grid" id="grid-double-con"></div>
+</section>
+
+<!-- 母音 -->
+<section id="vowel">
+  <p class="speak-hint">點擊字卡 → <span>▶ 朗讀</span></p>
+  <p class="section-title">基本母音 기본 모음 (10)</p>
+  <div class="grid" id="grid-basic-vow"></div>
+  <p class="section-title">複合母音 이중 모음 (11)</p>
+  <div class="grid" id="grid-double-vow"></div>
+</section>
+
+<!-- 全部 -->
+<section id="all">
+  <p class="speak-hint">點擊字卡 → <span>▶ 朗讀</span></p>
+  <p class="section-title">子音 자음 (19)</p>
+  <div class="grid" id="grid-all-con"></div>
+  <p class="section-title">母音 모음 (21)</p>
+  <div class="grid" id="grid-all-vow"></div>
+</section>
+
+<p class="note">※ 發音由瀏覽器語音合成引擎產生，建議使用 Chrome 以獲得最佳韓語效果</p>
+
+<script>
+const BASIC_CON = [
+  { kor:'ㄱ', roman:'g/k',  zh:'ㄍ/ㄎ', say:'가' },
+  { kor:'ㄴ', roman:'n',    zh:'ㄋ',    say:'나' },
+  { kor:'ㄷ', roman:'d/t',  zh:'ㄉ/ㄊ', say:'다' },
+  { kor:'ㄹ', roman:'r/l',  zh:'ㄌ',    say:'라' },
+  { kor:'ㅁ', roman:'m',    zh:'ㄇ',    say:'마' },
+  { kor:'ㅂ', roman:'b/p',  zh:'ㄅ/ㄆ', say:'바' },
+  { kor:'ㅅ', roman:'s',    zh:'ㄙ',    say:'사' },
+  { kor:'ㅇ', roman:'ng/-', zh:'(無音)', say:'아' },
+  { kor:'ㅈ', roman:'j',    zh:'ㄐ',    say:'자' },
+  { kor:'ㅊ', roman:'ch',   zh:'ㄔ',    say:'차' },
+  { kor:'ㅋ', roman:'k',    zh:'ㅋ',    say:'카' },
+  { kor:'ㅌ', roman:'t',    zh:'ㄊ',    say:'타' },
+  { kor:'ㅍ', roman:'p',    zh:'ㄆ',    say:'파' },
+  { kor:'ㅎ', roman:'h',    zh:'ㄏ',    say:'하' },
+];
+
+const DOUBLE_CON = [
+  { kor:'ㄲ', roman:'kk',  zh:'硬ㄍ', say:'까' },
+  { kor:'ㄸ', roman:'tt',  zh:'硬ㄉ', say:'따' },
+  { kor:'ㅃ', roman:'pp',  zh:'硬ㄅ', say:'빠' },
+  { kor:'ㅆ', roman:'ss',  zh:'硬ㄙ', say:'싸' },
+  { kor:'ㅉ', roman:'jj',  zh:'硬ㄐ', say:'짜' },
+];
+
+const BASIC_VOW = [
+  { kor:'ㅏ', roman:'a',  zh:'ㄚ',  say:'아' },
+  { kor:'ㅑ', roman:'ya', zh:'一ㄚ', say:'야' },
+  { kor:'ㅓ', roman:'eo', zh:'ㄜ',  say:'어' },
+  { kor:'ㅕ', roman:'yeo',zh:'一ㄜ', say:'여' },
+  { kor:'ㅗ', roman:'o',  zh:'ㄛ',  say:'오' },
+  { kor:'ㅛ', roman:'yo', zh:'一ㄛ', say:'요' },
+  { kor:'ㅜ', roman:'u',  zh:'ㄨ',  say:'우' },
+  { kor:'ㅠ', roman:'yu', zh:'一ㄨ', say:'유' },
+  { kor:'ㅡ', roman:'eu', zh:'ㄜ(扁)', say:'으' },
+  { kor:'ㅣ', roman:'i',  zh:'一',  say:'이' },
+];
+
+const DOUBLE_VOW = [
+  { kor:'ㅐ', roman:'ae',  zh:'ㄝ',    say:'애' },
+  { kor:'ㅒ', roman:'yae', zh:'一ㄝ',  say:'얘' },
+  { kor:'ㅔ', roman:'e',   zh:'ㄝ',    say:'에' },
+  { kor:'ㅖ', roman:'ye',  zh:'一ㄝ',  say:'예' },
+  { kor:'ㅘ', roman:'wa',  zh:'ㄨㄚ',  say:'와' },
+  { kor:'ㅙ', roman:'wae', zh:'ㄨㄝ',  say:'왜' },
+  { kor:'ㅚ', roman:'oe',  zh:'ㄨㄝ',  say:'외' },
+  { kor:'ㅝ', roman:'wo',  zh:'ㄨㄜ',  say:'워' },
+  { kor:'ㅞ', roman:'we',  zh:'ㄨㄝ',  say:'웨' },
+  { kor:'ㅟ', roman:'wi',  zh:'ㄨ一',  say:'위' },
+  { kor:'ㅢ', roman:'ui',  zh:'ㄜ一',  say:'의' },
+];
+
+function makeCard(item) {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.innerHTML = `<span class="kor">${item.kor}</span><span class="roman">${item.roman}</span><span class="zh">${item.zh}</span>`;
+  el.addEventListener('click', () => speak(item.say, el));
+  return el;
+}
+
+function fill(id, arr) {
+  const g = document.getElementById(id);
+  if (!g) return;
+  arr.forEach(item => g.appendChild(makeCard(item)));
+}
+
+fill('grid-basic-con',  BASIC_CON);
+fill('grid-double-con', DOUBLE_CON);
+fill('grid-basic-vow',  BASIC_VOW);
+fill('grid-double-vow', DOUBLE_VOW);
+fill('grid-all-con',    [...BASIC_CON, ...DOUBLE_CON]);
+fill('grid-all-vow',    [...BASIC_VOW, ...DOUBLE_VOW]);
+
+// ── SPEECH ──
+let currentCard = null;
+
+function speak(text, cardEl) {
+  if (!window.speechSynthesis) {
+    alert('你的瀏覽器不支援語音合成，請改用 Chrome 瀏覽器。');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  if (currentCard) currentCard.classList.remove('playing');
+  currentCard = cardEl;
+  cardEl.classList.add('playing');
+
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'ko-KR';
+  utter.rate = 0.85;
+  utter.pitch = 1.1;
+
+  // prefer a Korean voice if available
+  const voices = window.speechSynthesis.getVoices();
+  const koVoice = voices.find(v => v.lang.startsWith('ko'));
+  if (koVoice) utter.voice = koVoice;
+
+  utter.onend = () => cardEl.classList.remove('playing');
+  utter.onerror = () => cardEl.classList.remove('playing');
+
+  window.speechSynthesis.speak(utter);
+}
+
+// voices may load async
+window.speechSynthesis.onvoiceschanged = () => {};
+
+// ── TABS ──
+function show(id, btn) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
